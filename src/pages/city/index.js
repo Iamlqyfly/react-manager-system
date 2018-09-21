@@ -5,6 +5,76 @@ import Utils from './../../utils/utils';
 const FormItem = Form.Item;
 const Option = Select.Option;
 export default class City extends React.Component{
+    state = {
+        list: [],
+        isShowOpenCity: false
+    }
+    params = {
+        page: 1
+    }
+    componentDidMount() {
+        this.requestList()
+    }
+    requestList = ()=> {
+        let _this = this
+        axios.ajax({
+            url: '/open_city',
+            data: {
+                params: {
+                   page: this.params.page
+                }
+            }
+        }).then((res) => {
+            let list = res.result.item_list.map((item, index) => {
+                item.key = index
+                return item
+            })
+            this.setState({
+                list: list,
+                pagination: Utils.pagination(res, (current) => {
+                    _this.params.page = current
+                    _this.requestList()
+                })
+            })
+        })
+    }
+    handleOpenCity = ()=> {
+        this.setState({
+            isShowOpenCity: true
+        })
+    }
+    
+    handleSubmit = ()=>{
+        debugger
+        let cityInfo = this.cityForm.props.form.getFieldsValue()
+        axios.ajax({
+            url:'/city/open',
+            data:{
+                params:cityInfo
+            }
+        }).then((res)=>{
+            if(res.code == '0'){
+                message.success('开通成功');
+                this.setState({
+                    isShowOpenCity:false
+                })
+                this.requestList()
+            }
+        })
+    }
+     //查询提交
+    filterSubmit = ()=>{
+        this.requestList()
+    }
+    // 处理重置
+    handleReset() {
+        this.setState({
+          city_id: '',
+          mode: '',
+          op_mode: '',
+          auth_status: ''
+        })
+    }
     render() {
         const columns = [
             {
@@ -51,18 +121,45 @@ export default class City extends React.Component{
         return(
            <div>
                <Card>
-                    <FilterForm />
+                    <FilterForm  filterSubmit={this.filterSubmit}/>
                 </Card>
                 <Card style={{marginTop:10}}>
                     <Button type="primary" onClick={this.handleOpenCity}>开通城市</Button>
                 </Card>
+                <div className="content-wrap">
+                    <Table
+                        bordered
+                        columns={columns}
+                        dataSource={this.state.list}
+                        pagination={this.state.pagination}
+                    />
+                </div>
+                <Modal 
+                    title="开通城市"
+                    visible={this.state.isShowOpenCity}
+                    onCancel={()=>{
+                        this.setState({
+                            isShowOpenCity:false
+                        })
+                    }}
+                    onOk={this.handleSubmit}
+                >   
+                    <OpenCityForm wrappedComponentRef={(inst)=>{this.cityForm = inst;}}/>
+                </Modal>
            </div>
         )
     }
 }
 
 class FilterForm extends React.Component{
-
+    state = {}
+    handleFilterSubmit = ()=>{
+        this.props.filterSubmit()
+    }
+   // 在render里面写 filterSubmit={this.filterSubmit}
+    reset = () => {
+        this.props.form.resetFields();
+    };
     render(){
         const { getFieldDecorator } = this.props.form;
         return (
@@ -125,8 +222,8 @@ class FilterForm extends React.Component{
                     }
                 </FormItem>
                 <FormItem>
-                    <Button type="primary" style={{margin:'0 20px'}}>查询</Button>
-                    <Button>重置</Button>
+                    <Button type="primary" style={{margin:'0 20px'}} onClick={this.handleFilterSubmit}>查询</Button>
+                    <Button onClick={this.reset}>重置</Button>
                 </FormItem>
             </Form>
         );
