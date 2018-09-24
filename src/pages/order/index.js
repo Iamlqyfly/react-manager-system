@@ -6,7 +6,7 @@ import BaseForm from '../../components/BaseForm'
 const FormItem = Form.Item;
 const Option = Select.Option;
 export default class Order extends React.Component{
-    state  = {
+    state = {
         orderInfo:{},
         orderConfirmVisble:false
     }
@@ -20,11 +20,12 @@ export default class Order extends React.Component{
             field:'city',
             placeholder:'全部',
             initialValue:'1',
-            width:80,
+            width:90,
             list: [{ id: '0', name: '全部' }, { id: '1', name: '北京' }, { id: '2', name: '天津' }, { id: '3', name: '上海' }]
         },
         {
-            type: '时间查询'
+            type: '时间查询',
+            field:'select_time'
         },
         {
             type: 'SELECT',
@@ -32,20 +33,22 @@ export default class Order extends React.Component{
             field:'order_status',
             placeholder: '全部',
             initialValue: '1',
-            width: 80,
+            width: 120,
             list: [{ id: '0', name: '全部' }, { id: '1', name: '进行中' }, { id: '2', name: '结束行程' }]
         }
     ]
-    componentDidMount(){
+    componentDidMount() {
         this.requestList()
     }
-
     handleFilter = (params)=>{
         this.params = params;
         this.requestList();
     }
+     // 列表请求
+    // requestList = ()=>{
+    //     axios.requestList(this,'/order/list',this.params,true)
+    // }
     requestList = ()=>{
-        let _this = this;
         axios.ajax({
             url:'/order/list',
             data:{
@@ -65,8 +68,8 @@ export default class Order extends React.Component{
             })
         })
     }
-    // 订单结束确认
-    handleConfirm = ()=>{
+     // 订单结束确认
+     handleConfirm = ()=>{
         let item = this.state.selectedItem;
         if (!item) {
             Modal.info({
@@ -91,7 +94,6 @@ export default class Order extends React.Component{
             }
         })
     }
-
     // 结束订单
     handleFinishOrder = ()=>{
         let item = this.state.selectedItem;
@@ -130,8 +132,8 @@ export default class Order extends React.Component{
             return;
         }
         window.open(`/#/common/order/detail/${item.id}`,'_blank')
-    }
-    render(){
+    } 
+    render() {
         const columns = [
             {
                 title:'订单编号',
@@ -180,15 +182,15 @@ export default class Order extends React.Component{
                 title: '实付金额',
                 dataIndex: 'user_pay'
             }
-        ]
-        const formItemLayout = {
-            labelCol:{span:5},
-            wrapperCol:{span:19}
-        }
+        ] 
         const selectedRowKeys = this.state.selectedRowKeys;
         const rowSelection = {
             type: 'radio',
             selectedRowKeys
+        }
+        const formItemLayout = {
+            labelCol:{span:5},
+            wrapperCol:{span:19}
         }
         return (
             <div>
@@ -242,6 +244,6 @@ export default class Order extends React.Component{
                     </Form>
                 </Modal>
             </div>
-        );
+       )
     }
 }

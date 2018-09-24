@@ -1,5 +1,6 @@
 import JsonP from 'jsonp'
 import axios from 'axios'
+import Utils from '../utils/utils'
 import { Modal } from 'antd'
 export default class Axios {
     static jsonp(options) {
@@ -49,6 +50,39 @@ export default class Axios {
                     reject(response.data)
                 }
             })
+        })
+    }
+    static requestList(_this,url,params,isMock){
+        var data = {
+            params: params,
+            isMock
+        };
+        this.ajax({
+            url,
+            data
+        }).then(data =>{
+            if (data) {
+                if (data.result && data.result.item_list) {
+                    // message.success('请求列表成功!');
+                    debugger
+                    let list = data.result.item_list.map(function (item,index) {
+                        item.key = index;
+                        return item
+                    })
+                    _this.setState({
+                        list,
+                        pagination: Utils.pagination(data,(current)=>{
+                            _this.params.page = current;
+                            _this.requestList()
+                        }),
+                        selectedRowKeys: [],
+                        selectedItem:'',
+                        selectedIds:''
+                    })
+                }
+            } else {
+                alert("请求失败");
+            }
         })
     }
 }
