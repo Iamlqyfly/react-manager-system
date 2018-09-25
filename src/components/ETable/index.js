@@ -5,7 +5,7 @@ import  "./index.less"
 export default class ETable extends React.Component {
 
     state = {}
-    //处理行点击事件
+    // 处理行点击事件
     onRowClick = (record, index) => {
         let rowSelection = this.props.rowSelection;
         if(rowSelection == 'checkbox'){

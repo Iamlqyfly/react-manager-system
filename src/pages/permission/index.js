@@ -38,7 +38,7 @@ export default class Permisson extends React.Component{
     }
     //  角色提交
     handleRoleSubmit() {
-        let data = this.roleForm.props.form.getFieldsValue();
+        let data = this.roleForm.props.form.getFieldsValue()
         axios.ajax({
             url:'role/create',
             data:{
@@ -51,11 +51,16 @@ export default class Permisson extends React.Component{
                 this.setState({
                     isRoleVisible:false
                 })
-                this.requestList();
+                this.requestList()
             }
         })
     }
+    // handlePermission() {
+    //     debugger
+    //     console.log(this, 1) //undefined
+    // }
     handlePermission = ()=>{
+        console.log(this, 1)
         if (!this.state.selectedItem) {
             Modal.info({
                 title: '信息',
@@ -65,17 +70,17 @@ export default class Permisson extends React.Component{
         }
         this.setState({
             isPermVisible: true,
-            detailInfo: this.state.selectedItem
+            detailInfo: this.state.selectedItem // 当前选中的一行数据
         }) 
-        let menuList = this.state.selectedItem.menus
+        let menuList = this.state.selectedItem.menus // 所拥有的权限菜单栏目
         this.setState({
             menuInfo: menuList
         })
     }
     handlePermEditSubmit = ()=> {
         let data = this.roleForm.props.form.getFieldsValue()
-        data.role_id = this.state.selectedItem.id
-        data.menus = this.state.menuInfo
+        data.role_id = this.state.selectedItem.id // 当前选中用户的id值
+        data.menus = this.state.menuInfo // 当前选中用户的权限菜单栏目值
         axios.ajax({
             url:'/permission/edit',
             data:{
@@ -88,26 +93,85 @@ export default class Permisson extends React.Component{
                 this.setState({
                     isPermVisible:false
                 })
-                this.requestList();
+                this.requestList()
             }
         })
     }
+    // 用户授权
     handleUserAuth = ()=>{
         if (!this.state.selectedItem) {
             Modal.info({
                 title: '信息',
                 content: '未选中任何项目'
             })
-            return;
+            return
         }
+        this.getRoleUserList(this.state.selectedItem.id)
         this.setState({
             isUserVisible: true,
             isAuthClosed: false,
             detailInfo: this.state.selectedItem
         })
     }
+    // 用户授权提交
     handleUserSubmit = ()=> {
-
+        let data = {}
+        data.user_ids = this.state.targetKeys || []
+        data.role_id = this.state.selectedItem.id
+        axios.ajax({
+            url: '/role/user_role_edit',
+            data: {
+                params: {
+                    ...data
+                }
+          }
+        }).then(res => {
+            if (res) {
+                this.setState({
+                    isUserVisible: false
+                })
+                this.requestList()
+            }
+        })
+    }
+    
+    getRoleUserList = (id) => {
+        axios.ajax({
+            url: '/role/user_list',
+            data: {
+                params: {
+                    id: id
+                }
+            }
+        }).then(res => {
+            if (res) {
+                this.getAuthUserList(res.result)
+            }
+        })
+    }
+    //筛选目标用户
+    getAuthUserList = (dataSource) => {
+        const mockData = []
+        const targetKeys = []
+        if (dataSource && dataSource.length > 0) {
+            for (let i = 0; i < dataSource.length; i++) {
+                const data = {
+                   key: dataSource[i].user_id,
+                   title: dataSource[i].user_name,
+                   status: dataSource[i].status
+                }
+                if (data.status == 1) {
+                    targetKeys.push(data.key)
+                }
+                mockData.push(data)
+           }
+        }
+        this.setState({mockData, targetKeys})
+    }
+    patchUserInfo = (targetKeys) => {
+        this.setState({
+            targetKeys: targetKeys
+        })
     }
     render() {
         const columns = [
@@ -149,8 +213,10 @@ export default class Permisson extends React.Component{
                 </Card>
                 <div className="content-wrap">
                    <ETable
+                        updateSelectedItem={Utils.updateSelectedItem.bind(this)}
                         dataSource={this.state.list}
                         columns={columns} 
+                        selectedRowKeys={this.state.selectedRowKeys} // 指定选中项的key数组
                    />
                 </div>
                 <Modal
@@ -165,7 +231,7 @@ export default class Permisson extends React.Component{
                 }}
                 >   
                   <RoleForm wrappedComponentRef={(inst) => this.roleForm = inst }/>
-                </Modal>  
+                </Modal>
                 <Modal
                     title="权限设置"
                     visible={this.state.isPermVisible}
@@ -178,34 +244,42 @@ export default class Permisson extends React.Component{
                    }}>
                     <PermEditForm
                         wrappedComponentRef={(inst) => this.roleForm = inst }
-                        // detailInfo={this.state.detailInfo}
-                        // menuInfo={this.state.menuInfo||[]}
-                        // patchMenuInfo={(checkedKeys)=>{
-                        //     this.setState({
-                        //         menuInfo: checkedKeys
-                        //     });
-                        // }}
+                        detailInfo={this.state.detailInfo} // 当前选中的一行数据
+                        menuInfo={this.state.menuInfo||[]}
+                        patchMenuInfo={(checkedKeys)=>{
+                            this.setState({
+                                menuInfo: checkedKeys
+                            });
+                        }}
                     />
                </Modal>  
                 <Modal
-                       title="用户授权"
-                       visible={this.state.isUserVisible}
-                       width={800}
-                       onOk={this.handleUserSubmit}
-                       onCancel={()=>{
-                           this.setState({
-                               isUserVisible:false
-                           })
-                       }}>
+                    title="用户授权"
+                    visible={this.state.isUserVisible}
+                    width={800}
+                    onOk={this.handleUserSubmit}
+                    onCancel={()=>{
+                        this.setState({
+                            isUserVisible:false
+                        })
+                    }}>
+                    <RoleAuthForm
+                        wrappedComponentRef={(inst) => this.userAuthForm = inst }
+                        isClosed={this.state.isAuthClosed}
+                        detailInfo={this.state.detailInfo}
+                        targetKeys={this.state.targetKeys}
+                        mockData={this.state.mockData}
+                        patchUserInfo={this.patchUserInfo}
+                    />    
                 </Modal>
            </div>  
         )
     }
 }
 // 角色创建
-class RoleForm extends React.Component{
+class RoleForm extends React.Component {
     render(){
-        const { getFieldDecorator } = this.props.form;
+        const { getFieldDecorator } = this.props.form
         const formItemLayout = {
             labelCol: {span: 5},
             wrapperCol: {span: 16}
@@ -215,7 +289,7 @@ class RoleForm extends React.Component{
                 <FormItem label="角色名称" {...formItemLayout}>
                     {
                         getFieldDecorator('role_name',{
-                            initialValue:''
+                            initialValue: ''
                         })(
                             <Input type="text" placeholder="请输入角色名称"/>
                         )
@@ -236,13 +310,14 @@ class RoleForm extends React.Component{
         );
     }
 }
-RoleForm = Form.create({})(RoleForm);
+RoleForm = Form.create({})(RoleForm)
 
 // 设置权限
 class PermEditForm extends React.Component {
     state = {}
+    // 设置选中的节点，通过父组件方法再传递回来
     onCheck = (checkedKeys) => {
-        
+        this.props.patchMenuInfo(checkedKeys)
     }
     renderTreeNodes = (data, key='') => {
         return data.map(item => {
@@ -256,7 +331,7 @@ class PermEditForm extends React.Component {
             } else if (item.btnList) {
                 return (
                     <TreeNode title={item.title} key={parentKey} dataRef={item} className="op-role-tree"> 
-                        {this.renderTreeNodes(item.children, parentKey)} 
+                        {this.renderBtnTreeNode(item, parentKey)} 
                     </TreeNode>
                 )
             }
@@ -277,12 +352,12 @@ class PermEditForm extends React.Component {
             labelCol: {span: 5},
             wrapperCol: {span: 18}
         };
-        // const detail_info = this.props.detailInfo;
-        // const menuInfo = this.props.menuInfo;
+        const detail_info = this.props.detailInfo // 从那传进来的值
+        const menuInfo = this.props.menuInfo
         return (
             <Form layout="horizontal">
                 <FormItem label="角色名称：" {...formItemLayout}>
-                    <Input disabled maxLength="8" placeholder=""/>
+                    <Input disabled maxLength="8" placeholder={detail_info.role_name}/>
                 </FormItem>
                 <FormItem label="状态：" {...formItemLayout}>
                     {getFieldDecorator('status',{
@@ -297,8 +372,10 @@ class PermEditForm extends React.Component {
                     )}
                 </FormItem>
                 <Tree
-                    checkable
-                    defaultExpandAll
+                    checkable // 节点前添加 Checkbox 复选框
+                    defaultExpandAll // 默认展开所有树节点
+                    onCheck = {(checkedKeys) => this.onCheck(checkedKeys)} // 点击复选框触发
+                    checkedKeys = { menuInfo || []}
                 >
                     <TreeNode title="平台权限" key="platform_all">
                         {this.renderTreeNodes(menuConfig)}
@@ -314,10 +391,11 @@ PermEditForm = Form.create({})(PermEditForm)
 class RoleAuthForm extends React.Component {
 
     filterOption = (inputValue, option) => {
-        // return option.title.indexOf(inputValue) > -1;
+        return option.title.indexOf(inputValue) > -1
     };
+    //  接收 inputValue option 两个参数，当 option 符合筛选条件时，应返回 true，反之则返回 false
     handleChange = (targetKeys) => {
-        // this.props.patchUserInfo(targetKeys);
+        this.props.patchUserInfo(targetKeys)
     };
 
     render() {
@@ -325,27 +403,27 @@ class RoleAuthForm extends React.Component {
             labelCol: {span: 5},
             wrapperCol: {span: 18}
         };
-        // const detail_info = this.props.detailInfo;
+        const detail_info = this.props.detailInfo
         return (
             <Form layout="horizontal">
                 <FormItem label="角色名称：" {...formItemLayout}>
-                    <Input disabled maxLength={8} placeholder=""/>
+                    <Input disabled maxLength={8} placeholder={detail_info.role_name}/>
                 </FormItem>
                 <FormItem label="选择用户：" {...formItemLayout}>
                     <Transfer
-                        listStyle={{width: 200,height: 400}}
+                        listStyle={{width: 200,height: 400}} // 两个穿梭框的自定义样式
                         dataSource={this.props.mockData}
-                        showSearch
+                        showSearch // 显示搜索框
                         titles={['待选用户', '已选用户']}
                         searchPlaceholder='输入用户名'
                         filterOption={this.filterOption}
                         targetKeys={this.props.targetKeys}
                         onChange={this.handleChange}
-                        render={item => item.title}
+                        render={item => item.title}  // 每行数据渲染函数
                     />
                 </FormItem>
             </Form>
         )
     }
 }
-RoleAuthForm = Form.create({})(RoleAuthForm);
+RoleAuthForm = Form.create({})(RoleAuthForm)

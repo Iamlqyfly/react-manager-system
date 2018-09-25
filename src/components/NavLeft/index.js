@@ -8,7 +8,7 @@ import './index.less'
 const SubMenu = Menu.SubMenu;
 class NavLeft extends React.Component {
     state = {
-        currentKey: ''
+        currentKey: ''  //监控当前路由变化
     }
     // 菜单点击
     handleClick = ({ item, key }) => {
