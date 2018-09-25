@@ -1,6 +1,7 @@
 import React from 'react'
 import {Card} from 'antd'
-import ReactEcharts from 'echarts-for-react';
+// import ReactEcharts from 'echarts-for-react';
+import ReactEchartsCore from 'echarts-for-react/lib/core'
 import echartTheme from '../echartTheme'
 // import echarts from 'echarts'
 import echarts from 'echarts/lib/echarts'
@@ -16,7 +17,7 @@ export default class Line extends React.Component {
     state = {}
 
     componentWillMount(){
-        echarts.registerTheme('Imooc',echartTheme);
+        // echarts.registerTheme('Imooc',echartTheme);
     }
 
     getOption() {
@@ -151,10 +152,10 @@ export default class Line extends React.Component {
                         1000,
                         2000,
                         1500,
-                        3000,
+                        3500,
                         2000,
                         1200,
-                        800
+                        500
                     ],
                     areaStyle: {}
                 }
@@ -162,41 +163,37 @@ export default class Line extends React.Component {
         }
         return option;
     }
-
+  
     render() {
         return (
             <div>
                 <Card title="折线图表之一">
-                    <ReactEcharts
+                    <ReactEchartsCore
+                        echarts={echarts}
                         option={this.getOption()}
-                        theme="Imooc"
                         notMerge={true}
                         lazyUpdate={true}
-                        style={{
-                        height: 500
-                    }}/>
+                        theme={"theme_name"} />
                 </Card>
-                <Card title="折线图表之二" style={{marginTop:10}}>
-                    <ReactEcharts
+                <Card title="折线图表之二">
+                    <ReactEchartsCore
+                        echarts={echarts}
                         option={this.getOption2()}
-                        theme="Imooc"
                         notMerge={true}
                         lazyUpdate={true}
-                        style={{
-                        height: 500
-                    }}/>
+                        theme={"theme_name"} />
                 </Card>
-                <Card title="折线图表之三" style={{marginTop:10}}>
-                    <ReactEcharts
+                <Card title="折线图表之三">
+                    <ReactEchartsCore
+                        echarts={echarts}
                         option={this.getOption3()}
-                        theme="Imooc"
                         notMerge={true}
                         lazyUpdate={true}
-                        style={{
-                        height: 500
-                    }}/>
+                        theme={"theme_name"} />
                 </Card>
+               
+
             </div>
-        );
+        )
     }
 }

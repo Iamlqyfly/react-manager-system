@@ -17,7 +17,7 @@ export default class Bar extends React.Component {
     state = {}
 
     componentWillMount(){
-        echarts.registerTheme('Imooc',themeLight);
+        echarts.registerTheme('theme_name',themeLight);
     }
 
     getOption() {
@@ -28,7 +28,7 @@ export default class Bar extends React.Component {
             },
             legend : {
                 orient: 'vertical',
-                right: 10,
+                right: 20,
                 top: 20,
                 bottom: 20,
                 data: ['周一','周二','周三','周四','周五','周六','周日']
@@ -233,7 +233,7 @@ export default class Bar extends React.Component {
                 <Card title="饼形图表之一">
                     <ReactEcharts
                         option={this.getOption()}
-                        theme="Imooc"
+                        theme="theme_name"
                         notMerge={true}
                         lazyUpdate={true}
                         style={{ height: 500 }}/>
@@ -241,7 +241,7 @@ export default class Bar extends React.Component {
                 <Card title="饼形图之二" style={{marginTop:10}}>
                     <ReactEcharts
                         option={this.getOption2()}
-                        theme="Imooc"
+                        theme="theme_name"
                         notMerge={true}
                         lazyUpdate={true}
                         style={{ height: 500 }}/>
@@ -249,7 +249,7 @@ export default class Bar extends React.Component {
                 <Card title="饼形图之三" style={{marginTop:10}}>
                     <ReactEcharts
                         option={this.getOption3()}
-                        theme="Imooc"
+                        theme="theme_name"
                         notMerge={true}
                         lazyUpdate={true}
                         style={{ height: 500 }}/>

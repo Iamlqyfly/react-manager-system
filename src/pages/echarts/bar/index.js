@@ -1,9 +1,10 @@
 import React from 'react'
 import { Card } from 'antd'
-import ReactEcharts from 'echarts-for-react';
+// import ReactEcharts from 'echarts-for-react'
+import ReactEchartsCore from 'echarts-for-react/lib/core'
 import echartTheme from '../echartTheme'
 // import echarts from 'echarts'
-// 引入 ECharts 主模块
+// 引入 ECharts 主模块  按需加载模块
 import echarts from 'echarts/lib/echarts'
 // 引入饼图和折线图
 import 'echarts/lib/chart/bar'
@@ -13,52 +14,37 @@ import 'echarts/lib/component/title';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/markPoint';
 export default class Bar extends React.Component {
+    state = {}
+    componentWillMount() {
 
-    state={}
-
-    componentWillMount(){
-        echarts.registerTheme('Imooc',echartTheme);
     }
-
-    getOption(){
+    getOption() {
         let option = {
             title: {
                 text: '用户骑行订单'
             },
-            tooltip : {
+            tooltip: {
                 trigger: 'axis'
             },
             xAxis: {
-                data: [
-                    '周一',
-                    '周二',
-                    '周三',
-                    '周四',
-                    '周五',
-                    '周六',
-                    '周日'
+                data: ['周一','周二','周三','周四','周五','周六','周日']
+            },
+            yAxis: { type: 'value'},
+            series: [{
+                name: '订单量',
+                type: 'bar',
+                data: [  // 对应着y轴的值
+                    1000,
+                    2000,
+                    1500,
+                    4000,
+                    2000,
+                    1200,
+                    800
                 ]
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: [
-                {
-                    name: '订单量',
-                    type: 'bar',
-                    data: [
-                        1000,
-                        2000,
-                        1500,
-                        3000,
-                        2000,
-                        1200,
-                        800
-                    ]
-                }
-            ]
+            }]
         }
-        return option;
+        return option
     }
 
     getOption2(){
@@ -130,17 +116,39 @@ export default class Bar extends React.Component {
         }
         return option;
     }
+    getOption3() {
 
-    render(){
+    }
+    render() {
         return (
             <div>
                 <Card title="柱形图表之一">
-                    <ReactEcharts option={this.getOption()} theme="Imooc" notMerge={true} lazyUpdate={true} style={{ height: 500 }} />
+                    <ReactEchartsCore
+                        echarts={echarts}
+                        option={this.getOption()}
+                        notMerge={true}
+                        lazyUpdate={true}
+                        theme={"theme_name"} />
                 </Card>
-                <Card title="柱形图表之二" style={{marginTop:10}}>
-                    <ReactEcharts option={this.getOption2()} theme="Imooc" notMerge={true} lazyUpdate={true} style={{ height: 500 }} />
+                <Card title="柱形图表之二">
+                    <ReactEchartsCore
+                        echarts={echarts}
+                        option={this.getOption2()}
+                        notMerge={true}
+                        lazyUpdate={true}
+                        theme={"theme_name"} />
                 </Card>
-            </div> 
-        );
+                {/* <Card title="柱形图表之三">
+                    <ReactEchartsCore
+                        echarts={echarts}
+                        option={this.getOption3()}
+                        notMerge={true}
+                        lazyUpdate={true}
+                        theme={"theme_name"} />
+                </Card> */}
+               
+
+            </div>
+        )
     }
 }
