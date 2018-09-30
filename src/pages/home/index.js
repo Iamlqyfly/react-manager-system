@@ -5,7 +5,7 @@ export default class Home extends React.Component{
     render(){
         return (
             <div className="home-wrap">
-                welcome to manager system based on react-antD
+                welcome to manager system based on react+antd
             </div>
         );
     }

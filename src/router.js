@@ -9,6 +9,7 @@ import FormRegister from './pages/form/register'
 import BasicTable from './pages/table/basicTable'
 import HighTable from './pages/table/highTable'
 import Rich from './pages/rich'
+import NoMatch from './pages/nomatch'
 import City from './pages/city/index'
 import Order from './pages/order/index'
 import Common from './common'
@@ -52,7 +53,7 @@ export default class ERouter extends React.Component{
                                     <Route path="/charts/line" component={Line} />
                                     <Route path="/permission" component={Permission} />
                                     <Redirect to="/home" />
-                                    {/* <Route component={NoMatch} /> */}
+                                    <Route component={NoMatch} />
                                 </Switch>
                             </Admin>         
                         } />

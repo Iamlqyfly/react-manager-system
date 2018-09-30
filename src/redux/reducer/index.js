@@ -8,7 +8,7 @@
     switch (action.type) {
       case type.SWITCH_MENU:
         return {
-          ...state,
+          ...state, //原有数据状态
           menuName: action.menuName // 新的数据
         }
       default: 

@@ -1,9 +1,11 @@
 import React from 'react'
-import { Row,Col } from "antd"
+import { Row,Col,Modal} from "antd"
 import './index.less'
 import Util from '../../utils/utils'
+import Store from '../../utils/store'
 import axios from '../../axios'
 import { connect } from 'react-redux'
+const confirm = Modal.confirm;
 class Header extends React.Component{
     state={}
     componentWillMount(){
@@ -18,7 +20,17 @@ class Header extends React.Component{
         },1000)
         this.getWeatherAPIData();
     }
-
+    
+    logout =() => {
+        confirm({
+            title: '是否确定退出系统?',
+            onOk() {
+                Store.save("username", "");
+                // Utils.clearUid();
+                window.location.href = '/#/login';
+            },
+        })    
+    }
     getWeatherAPIData(){
         let city = '深圳';
         axios.jsonp({
@@ -27,7 +39,7 @@ class Header extends React.Component{
             if(res.status == 'success'){
                 let data = res.results[0].weather_data[0];
                 this.setState({
-                    dayPictureUrl:data.dayPictureUrl,
+                    dayPictureUrl:data.dayPictureUrl, // 白天的天气图片
                     weather:data.weather
                 })
             }
@@ -47,7 +59,7 @@ class Header extends React.Component{
                     }
                     <Col span={menuType?18:24}>
                         <span>欢迎，{this.state.userName}</span>
-                        <a href="#">退出</a>
+                        <a onClick={this.logout}>退出</a>
                     </Col>
                 </Row>
                 

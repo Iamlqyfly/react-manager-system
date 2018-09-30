@@ -16,7 +16,7 @@ class NavLeft extends React.Component {
             return false;
         }
         // 事件派发，自动调用reducer，通过reducer保存到store对象中
-        const { dispatch } = this.props;
+        const { dispatch } = this.props; //要导出connect才能拿到dispatch
         dispatch(switchMenu(item.props.title));
 
         this.setState({
@@ -64,7 +64,9 @@ class NavLeft extends React.Component {
                 </NavLink>
                 <Menu
                     onClick={this.handleClick}
+                    // selectedKeys={this.state.currentKey} 
                     theme="dark"
+                    // selectedKeys={['/rich']} 默认当前选中的菜单
                 >
                     { this.state.menuTreeNode }
                 </Menu>
